@@ -238,7 +238,18 @@ async def _sync_calls(calls, store, quality, interval=15):
         await asyncio.sleep(interval)
 
 
+def _load_env():
+    """`.env` qiymatlarini os.environ ga yuklaydi (systemd EnvironmentFile'siz)."""
+    env = ROOT / '.env'
+    if env.exists():
+        for line in env.read_text(encoding='utf-8').splitlines():
+            if line.strip() and not line.lstrip().startswith('#') and '=' in line:
+                key, value = line.split('=', 1)
+                os.environ.setdefault(key.strip(), value.strip())
+
+
 async def run():
+    _load_env()
     set_locale(os.environ.get('INTERFACE_LANG', 'uz'))
     session = os.environ.get('VOICE_SESSION', '').strip()
     if not session:
