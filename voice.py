@@ -112,6 +112,7 @@ class VoiceModerator:
             LOG.warning('STT xato chat=%s user=%s: %s', chat, user, exc)
             return
         if text:
+            LOG.info('eshitildi chat=%s user=%s: %r', chat, user, text)
             self.on_speech(chat, user, text, now)
 
     def _queue_mute(self, chat, user, now):
@@ -137,6 +138,7 @@ class VoiceModerator:
         if not verdict:
             return None
         kind, term = verdict
+        LOG.info('CHEKLANDI (%s) chat=%s user=%s so_z=%r', kind, chat, user, term)
         self._queue_mute(chat, user, now)
         if kind == 'mute':
             self.store.alert(f'voicemute:{chat}', chat, t('voice_muted', minutes=self.mute_minutes), now)

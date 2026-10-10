@@ -49,17 +49,20 @@ def canon(text):
     return [_collapse(tok) for tok in text.split() if tok]
 
 
-def _load_set(path):
+def _terms_from_text(text):
+    """Matndan (fayl yoki seed) kanonik haqorat yozuvlari to'plamini yig'adi."""
     terms = set()
-    if path.exists():
-        for line in path.read_text(encoding='utf-8').splitlines():
-            line = line.split('#', 1)[0].strip()
-            if line:
-                # Lug'at yozuvining o'zini ham kanonik shaklga keltiramiz.
-                parts = canon(line)
-                if parts:
-                    terms.add(' '.join(parts))
+    for line in text.splitlines():
+        line = line.split('#', 1)[0].strip()
+        if line:
+            parts = canon(line)
+            if parts:
+                terms.add(' '.join(parts))
     return terms
+
+
+def _load_set(path):
+    return _terms_from_text(path.read_text(encoding='utf-8')) if path.exists() else set()
 
 
 class Profanity:
@@ -99,7 +102,11 @@ class Profanity:
         if not white_path.exists():
             white_path.write_text(_SEED_ALLOW, encoding='utf-8')
             white_path.chmod(0o600)
-        return cls(_load_set(strong_path), _load_set(review_path), _load_set(white_path))
+        # Koddagi o'rnatilgan lug'at HAR DOIM faol + admin qo'shimchalari (data/).
+        strong = _terms_from_text(_SEED_STRONG) | _load_set(strong_path)
+        review = _terms_from_text(_SEED_REVIEW) | _load_set(review_path)
+        allow = _terms_from_text(_SEED_ALLOW) | _load_set(white_path)
+        return cls(strong, review, allow)
 
     def check(self, text):
         tokens = canon(text)
@@ -130,21 +137,105 @@ class Profanity:
 # bir xil kanonik shaklga keltiriladi.
 _SEED_STRONG = """\
 # Aniq haqorat — aniqlanganda foydalanuvchi vaqtincha cheklanadi.
-# Har qatorda bitta so'z yoki ibora. '#' bilan izoh. Lotin/kirill farqi yo'q.
+# Har qatorda bitta so'z yoki ibora. '#' bilan izoh. Lotin/kirill farqi yo'q
+# (kirill avtomatik lotinga o'giriladi). Takror harflar qisqaradi.
+# Admin data/profanity.uz.txt ga qo'shimcha so'z yozishi mumkin.
+
+# sik- o'zagi (eng keng tarqalgan)
+sik
+sike
+ske
+ska
+skey
+sikay
+sikayman
+sikaman
+sikasan
+sikaveraman
+siktir
+siktirbo
+siktirbol
+sikib
+sikkan
+sikish
+sikishish
+sikkanimni
+sikaman seni
+seni sikay
+# ona/ena haqoratli iboralari
+onangni sik
+onangni sikay
+onangni skey
+onani sik
+onangni sikaman
+enangni sik
+enangni sikay
+onangni emgan
+# nomli haqoratlar
 jalab
+jalap
+qahba
+qahpa
+kahba
+kahpa
 ablah
 haromi
+haromzoda
+xaromi
+xaromzoda
+qotoq
+kotoq
+qutoq
+gandon
+gondon
+dalbayob
+dolboyob
+dalboyob
+dolbayob
+pashmoq
+amjalab
+# ruscha (o'zbekcha so'zlashuvda keng ishlatiladi)
+suka
+suke
+blya
+blyat
+blyad
+blyadi
+nahuy
+nahui
+huylo
+pizda
+pizdes
+mudak
+pidaras
+pidor
+yoban
+ebal
+ebalo
+zalupa
 """
 
 _SEED_REVIEW = """\
-# Shubhali/kontekstga bog'liq — avtomatik jazo o'rniga administratorga yuboriladi.
-# Oddiy suhbatda ham uchrashi mumkin bo'lgan so'zlar shu yerga.
+# Shubhali/engil haqorat — foydalanuvchi cheklanadi, lekin admin xabardor
+# qilinadi va kerak bo'lsa /release bilan qaytaradi (STT xatosi bo'lishi mumkin).
 eshak
 tentak
+ahmoq
+jinni
+nodon
+galvars
+tvoyamat
 """
 
 _SEED_ALLOW = """\
-# Begunoh so'zlar — tasodifan haqorat ro'yxatiga tushib qolsa ham jazolanmaydi.
+# Begunoh so'zlar — haqorat ro'yxatiga tushib qolsa ham jazolanmaydi.
+# Diniy va oddiy so'zlar shu yerda himoyalanadi (masalan harom/halol).
 assalom
 salom
+harom
+halol
+haromdan
+halaldan
+sakkiz
+sigir
 """
