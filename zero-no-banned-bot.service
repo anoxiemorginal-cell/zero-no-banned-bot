@@ -1,0 +1,17 @@
+[Unit]
+Description=Zero No Banned Telegram group protection
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/kali/Projects/zero-no-banned-bot
+ExecStart=/home/kali/Projects/zero-no-banned-bot/.venv/bin/python bot.py
+Restart=on-failure
+RestartSec=10
+UMask=0077
+NoNewPrivileges=true
+TimeoutStopSec=15
+
+[Install]
+WantedBy=default.target

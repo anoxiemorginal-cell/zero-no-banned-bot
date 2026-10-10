@@ -1,0 +1,6 @@
+httpx==0.28.1
+
+# Ovozli chat moderatsiyasi uchun (ixtiyoriy — faqat voice.py ishlatilganda):
+#   telethon==1.36.0
+#   py-tgcalls==2.1.6
+#   faster-whisper==1.0.3   # STT_ENGINE=faster-whisper uchun

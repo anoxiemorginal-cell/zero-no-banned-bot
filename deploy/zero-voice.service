@@ -1,0 +1,19 @@
+[Unit]
+Description=Zero No Banned — ovozli chat moderatsiyasi (userbot)
+After=network-online.target zero-guard.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/zero-no-banned-bot
+ExecStart=/opt/zero-no-banned-bot/.venv/bin/python voice.py
+Restart=on-failure
+RestartSec=15
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+TimeoutStopSec=20
+
+[Install]
+WantedBy=multi-user.target

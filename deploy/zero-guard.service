@@ -1,0 +1,19 @@
+[Unit]
+Description=Zero No Banned — Telegram guruh himoyasi (asosiy bot)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/zero-no-banned-bot
+ExecStart=/opt/zero-no-banned-bot/.venv/bin/python bot.py
+Restart=on-failure
+RestartSec=10
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+TimeoutStopSec=15
+
+[Install]
+WantedBy=multi-user.target
